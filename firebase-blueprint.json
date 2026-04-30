@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user health data and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "name": { "type": "string" },
+        "age": { "type": "number" },
+        "weight": { "type": "number" },
+        "height": { "type": "number" },
+        "goal": { "type": "string", "enum": ["weight_loss", "muscle_gain", "maintenance", "healthy_living"] },
+        "dietaryRestrictions": { "type": "array", "items": { "type": "string" } },
+        "preferences": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "MealPlan": {
+      "title": "Meal Plan",
+      "description": "Daily meal recommendations for a user",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "date": { "type": "string" },
+        "meals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "name": { "type": "string" },
+              "calories": { "type": "number" },
+              "protein": { "type": "number" },
+              "carbs": { "type": "number" },
+              "fats": { "type": "number" },
+              "ingredients": { "type": "array", "items": { "type": "string" } },
+              "instructions": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "date", "meals"]
+    },
+    "DailyLog": {
+      "title": "Daily Log",
+      "description": "User's daily intake and progress tracking",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "date": { "type": "string" },
+        "caloriesConsumed": { "type": "number" },
+        "waterIntake": { "type": "number" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "date"]
+    },
+    "MealFeedback": {
+      "title": "Meal Feedback",
+      "description": "User feedback on specific meals",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "mealName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "mealName", "rating"]
+    },
+    "GroceryList": {
+      "title": "Grocery List",
+      "description": "Consolidated shopping list",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "category": { "type": "string" },
+              "checked": { "type": "boolean" },
+              "amount": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "items"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "UserProfile",
+      "description": "User profiles"
+    },
+    "/mealPlans/{planId}": {
+      "schema": "MealPlan",
+      "description": "Generated meal plans"
+    },
+    "/dailyLogs/{logId}": {
+      "schema": "DailyLog",
+      "description": "Daily progress logs"
+    },
+    "/mealFeedback/{feedbackId}": {
+      "schema": "MealFeedback",
+      "description": "User feedback on meals"
+    },
+    "/groceryLists/{listId}": {
+      "schema": "GroceryList",
+      "description": "User grocery lists"
+    }
+  }
+}

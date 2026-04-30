@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.uid;
+    }
+    
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) &&
+             data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             (data.name is string && data.name.size() < 100) &&
+             (!('age' in data) || (data.age is number && data.age > 0 && data.age < 150)) &&
+             (!('weight' in data) || (data.weight is number && data.weight > 0)) &&
+             (!('height' in data) || (data.height is number && data.height > 0));
+    }
+
+    function isValidMealPlan(data) {
+      return data.keys().hasAll(['uid', 'date', 'meals']) &&
+             data.uid == request.auth.uid &&
+             data.meals is list;
+    }
+
+    function isValidDailyLog(data) {
+      return data.keys().hasAll(['uid', 'date']) &&
+             data.uid == request.auth.uid;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && isValidUser(request.resource.data);
+      allow update: if isOwner(uid) && isValidUser(request.resource.data);
+    }
+
+    match /mealPlans/{planId} {
+      allow read: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid && isValidMealPlan(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.uid == request.auth.uid && isValidMealPlan(request.resource.data);
+      allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
+    }
+
+    match /dailyLogs/{logId} {
+      allow read: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid && isValidDailyLog(request.resource.data);
+      allow update: if isAuthenticated() && resource.data.uid == request.auth.uid && isValidDailyLog(request.resource.data);
+      allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
+    }
+
+    match /mealFeedback/{feedbackId} {
+      allow read: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
+    }
+
+    match /groceryLists/{listId} {
+      allow read: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.uid == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.uid == request.auth.uid;
+    }
+  }
+}
