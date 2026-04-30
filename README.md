@@ -1,6 +1,8 @@
 
 ## Run Locally in the VSCODE Terminal 
-FRONTEND RUN 
+
+FRONTEND RUN
+
 1. call the folder first to run the frontend
    "PS D:\Projects\TnP_Project> cd frontend-react"
    Then install and run node.js
@@ -12,7 +14,9 @@ FRONTEND RUN
 4. Run the app:
    `npm run dev`
 then click on port by ctrl + click (with mouse)
+
 BACKEND RUN (JAVA & PYTHON)
+
 Next Terminal for JAVA & PYTHON separated two terminal
 1. call the folder first to run the backend java for java 
    'PS D:\Projects\TnP_Project> cd backend-java'
